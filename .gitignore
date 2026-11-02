@@ -1,0 +1,16 @@
+# Compilados de Maven
+target/
+dependency-reduced-pom.xml
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Registros
+*.log

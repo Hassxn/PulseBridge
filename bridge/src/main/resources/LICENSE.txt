@@ -1,0 +1,20 @@
+PulseProxy / PulseProxy Bridge
+Copyright (c) 2026 Hassxn. Todos los derechos reservados. / All rights reserved.
+
+ESPAÑOL
+Este software es propiedad exclusiva de Hassxn y se distribuye únicamente bajo licencia
+a compradores autorizados a través de BuiltByBit. Se prohíbe, sin autorización escrita del autor:
+  - redistribuir, compartir, revender, sublicenciar o publicar el software o partes de él;
+  - descompilar, desofuscar, modificar o crear obras derivadas para su distribución;
+  - eliminar o alterar los avisos de copyright o los identificadores de licencia.
+Cada copia contiene identificadores únicos del comprador. Las copias filtradas pueden rastrearse
+y las licencias involucradas serán revocadas, sin perjuicio de las acciones legales que correspondan.
+
+ENGLISH
+This software is the exclusive property of Hassxn and is distributed only under license to
+authorized buyers through BuiltByBit. Without the author's written permission it is forbidden to:
+  - redistribute, share, resell, sublicense or publish the software or any part of it;
+  - decompile, deobfuscate, modify or create derivative works for distribution;
+  - remove or alter copyright notices or license identifiers.
+Every copy contains unique buyer identifiers. Leaked copies can be traced and the licenses
+involved will be revoked, without prejudice to any applicable legal action.
