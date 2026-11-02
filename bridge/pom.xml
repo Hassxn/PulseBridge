@@ -11,6 +11,14 @@
     <name>PulseProxyBridge</name>
     <description>Plugin compañero de PulseProxy para los backends (menús de inventario)</description>
 
+    <licenses>
+        <license>
+            <name>Proprietary Use-Only License / Licencia propietaria de solo uso</name>
+            <url>https://github.com/Hassxn/PulseBridge/blob/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <properties>
         <!-- Java 8 para que funcione también en servidores 1.8 -->
         <maven.compiler.release>8</maven.compiler.release>

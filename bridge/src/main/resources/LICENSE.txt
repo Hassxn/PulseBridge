@@ -1,20 +1,44 @@
-PulseProxy / PulseProxy Bridge
-Copyright (c) 2026 Hassxn. Todos los derechos reservados. / All rights reserved.
+PulseBridge — Proprietary Use-Only License
+Copyright (c) 2026 Hassxn. All rights reserved.
+
+Permission is granted to persons who lawfully obtain this software to install,
+compile without changing the source, and run it on servers they own or administer,
+including commercial servers. Copies may be made only as necessary for that use
+and for private backups. Editing external configuration files for normal operation
+is permitted; this does not authorize changes to the source code or binaries.
+
+No permission is granted to modify, adapt, create derivative works of, distribute,
+redistribute, share, publish, sell, rent, sublicense, or otherwise transfer this
+software, its source code, binaries, or any part of them to third parties without
+prior written permission from Hassxn. Copyright and license notices must remain intact.
+
+All rights not expressly granted are reserved. Mandatory rights under applicable
+law and third-party licenses are unaffected.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, TO THE MAXIMUM
+EXTENT PERMITTED BY APPLICABLE LAW. TO THAT EXTENT, THE COPYRIGHT HOLDER IS NOT
+LIABLE FOR DAMAGES OR CLAIMS ARISING FROM ITS USE.
 
 ESPAÑOL
-Este software es propiedad exclusiva de Hassxn y se distribuye únicamente bajo licencia
-a compradores autorizados a través de BuiltByBit. Se prohíbe, sin autorización escrita del autor:
-  - redistribuir, compartir, revender, sublicenciar o publicar el software o partes de él;
-  - descompilar, desofuscar, modificar o crear obras derivadas para su distribución;
-  - eliminar o alterar los avisos de copyright o los identificadores de licencia.
-Cada copia contiene identificadores únicos del comprador. Las copias filtradas pueden rastrearse
-y las licencias involucradas serán revocadas, sin perjuicio de las acciones legales que correspondan.
 
-ENGLISH
-This software is the exclusive property of Hassxn and is distributed only under license to
-authorized buyers through BuiltByBit. Without the author's written permission it is forbidden to:
-  - redistribute, share, resell, sublicense or publish the software or any part of it;
-  - decompile, deobfuscate, modify or create derivative works for distribution;
-  - remove or alter copyright notices or license identifiers.
-Every copy contains unique buyer identifiers. Leaked copies can be traced and the licenses
-involved will be revoked, without prejudice to any applicable legal action.
+PulseBridge — Licencia propietaria de solo uso
+Copyright (c) 2026 Hassxn. Todos los derechos reservados.
+
+Se permite a quienes obtengan legalmente este software instalarlo, compilarlo sin
+cambiar el código fuente y ejecutarlo en servidores que posean o administren,
+incluidos servidores comerciales. Solo se permiten las copias necesarias para
+ese uso y las copias de seguridad privadas. Se permite editar archivos externos
+de configuración para el funcionamiento normal; esto no autoriza modificar el
+código fuente ni los binarios.
+
+No se permite modificar, adaptar, crear obras derivadas, distribuir, redistribuir,
+compartir, publicar, vender, alquilar, sublicenciar ni transferir a terceros este
+software, su código fuente, sus binarios o cualquier parte de ellos sin autorización
+previa y por escrito de Hassxn. Los avisos de copyright y licencia deben conservarse.
+
+Se reservan todos los derechos no concedidos expresamente. No se limitan los
+derechos imperativos de la legislación aplicable ni las licencias de terceros.
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍAS DE NINGÚN TIPO, EN LA MÁXIMA
+MEDIDA PERMITIDA POR LA LEGISLACIÓN APLICABLE. EN ESA MEDIDA, EL TITULAR DEL COPYRIGHT
+NO RESPONDE POR DAÑOS O RECLAMACIONES DERIVADOS DE SU USO.

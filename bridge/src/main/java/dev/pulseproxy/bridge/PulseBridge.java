@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2026 Hassxn. All rights reserved / Todos los derechos reservados.
+ * SPDX-License-Identifier: LicenseRef-PulseBridge-Use-Only
+ *
+ * English: Use only. Modification and distribution are prohibited without
+ * prior written permission from Hassxn. See LICENSE for the full terms.
+ *
+ * Español: Solo uso. Se prohíbe modificar y distribuir sin autorización
+ * previa y por escrito de Hassxn. Consulte LICENSE y LICENSE.es.md.
+ */
+
 package dev.pulseproxy.bridge;
 
 import com.google.gson.JsonArray;
@@ -36,8 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PulseBridge extends JavaPlugin implements PluginMessageListener, Listener {
 
     static final String CHANNEL = "pulseproxy:bridge";
-    private static final String COPYRIGHT = "PulseProxy Bridge (c) 2026 Hassxn - Todos los derechos reservados / All rights reserved. "
-            + "Prohibida su redistribucion. Licencia: %%__USER__%% / %%__NONCE__%%";
+    private static final String COPYRIGHT = "PulseProxy Bridge (c) 2026 Hassxn - Solo uso / Use only. Prohibido modificar o distribuir / Modification or distribution prohibited.";
 
     private final Map<UUID, String> openSessions = new ConcurrentHashMap<UUID, String>();
 
@@ -48,7 +58,7 @@ public final class PulseBridge extends JavaPlugin implements PluginMessageListen
         getServer().getPluginManager().registerEvents(this, this);
         for (Player p : Bukkit.getOnlinePlayers()) helloLater(p);
         getLogger().info("PulseProxy Bridge activo. Los menús de PulseProxy se abrirán como inventario.");
-        getLogger().info("(c) 2026 Hassxn. Todos los derechos reservados.");
+        getLogger().info(COPYRIGHT);
     }
 
     @Override
