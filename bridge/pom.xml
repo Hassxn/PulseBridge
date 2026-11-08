@@ -6,7 +6,7 @@
 
     <groupId>dev.pulseproxy</groupId>
     <artifactId>PulseProxyBridge</artifactId>
-    <version>1.1.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>PulseProxyBridge</name>
     <description>Plugin compañero de PulseProxy para los backends (menús de inventario)</description>
@@ -33,7 +33,6 @@
     </repositories>
 
     <dependencies>
-        <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.13.2</version><scope>test</scope></dependency>
         <!-- API de 1.8.8: lo que compila contra ella funciona de 1.8 a la última -->
         <dependency>
             <groupId>org.spigotmc</groupId>
