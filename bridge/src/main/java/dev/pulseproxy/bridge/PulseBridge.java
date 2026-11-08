@@ -47,16 +47,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PulseBridge extends JavaPlugin implements PluginMessageListener, Listener {
 
     static final String CHANNEL = "pulseproxy:bridge";
+    private String channel=CHANNEL;
+    private final NetworkEventCache networkEvents=new NetworkEventCache();
+    private final Map<String,Long> publishedTimers=new java.util.HashMap<String,Long>();
+    private String lastTimer;
+    private boolean timerApiWarned;
     private static final String COPYRIGHT = "PulseProxy Bridge (c) 2026 Hassxn - Solo uso / Use only. Prohibido modificar o distribuir / Modification or distribution prohibited.";
 
     private final Map<UUID, String> openSessions = new ConcurrentHashMap<UUID, String>();
 
     @Override
     public void onEnable() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
-        getServer().getMessenger().registerIncomingPluginChannel(this, CHANNEL, this);
+        saveDefaultConfig();
+        try { getServer().getMessenger().registerOutgoingPluginChannel(this, channel); }
+        catch (IllegalArgumentException legacy) { channel="pulse:bridge"; getServer().getMessenger().registerOutgoingPluginChannel(this,channel); }
+        getServer().getMessenger().registerIncomingPluginChannel(this, channel, this);
         getServer().getPluginManager().registerEvents(this, this);
         for (Player p : Bukkit.getOnlinePlayers()) helloLater(p);
+        getServer().getScheduler().runTaskTimer(this,new Runnable(){public void run(){publishHcfTimers();}},20L,Math.max(20,getConfig().getLong("hcf-timers.interval-ticks",100)));
         getLogger().info("PulseProxy Bridge activo. Los menús de PulseProxy se abrirán como inventario.");
         getLogger().info(COPYRIGHT);
     }
@@ -67,14 +75,15 @@ public final class PulseBridge extends JavaPlugin implements PluginMessageListen
             if (openSessions.containsKey(p.getUniqueId())) p.closeInventory();
         }
         openSessions.clear();
+        networkEvents.clear();
         for (Player p : Bukkit.getOnlinePlayers()) {
             JsonObject bye = new JsonObject();
             bye.addProperty("type", "BYE");
             send(p, bye);
             break;
         }
-        getServer().getMessenger().unregisterIncomingPluginChannel(this, CHANNEL);
-        getServer().getMessenger().unregisterOutgoingPluginChannel(this, CHANNEL);
+        getServer().getMessenger().unregisterIncomingPluginChannel(this, channel);
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this, channel);
     }
 
     private void helloLater(final Player p) {
@@ -94,7 +103,7 @@ public final class PulseBridge extends JavaPlugin implements PluginMessageListen
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             new DataOutputStream(bytes).writeUTF(payload.toString());
-            p.sendPluginMessage(this, CHANNEL, bytes.toByteArray());
+            p.sendPluginMessage(this, channel, bytes.toByteArray());
         } catch (Exception e) {
             getLogger().warning("No se pudo enviar al proxy: " + e.getMessage());
         }
@@ -102,7 +111,7 @@ public final class PulseBridge extends JavaPlugin implements PluginMessageListen
 
     @Override
     public void onPluginMessageReceived(String channel, Player carrier, byte[] data) {
-        if (!CHANNEL.equals(channel)) return;
+        if (!this.channel.equals(channel) || data.length > 32766) return;
         JsonObject o;
         try {
             String json = new DataInputStream(new ByteArrayInputStream(data)).readUTF();
@@ -119,12 +128,79 @@ public final class PulseBridge extends JavaPlugin implements PluginMessageListen
             }
         }
         String type = o.has("type") ? o.get("type").getAsString() : "";
-        if ("OPEN".equals(type)) {
+        if ("NETWORK_EVENTS".equals(type)) {
+            receiveEvents(o);
+        } else if ("OPEN".equals(type)) {
             open(target, o);
         } else if ("CLOSE".equals(type)) {
             String session = o.has("session") ? o.get("session").getAsString() : "";
             if (session.equals(openSessions.get(target.getUniqueId()))) target.closeInventory();
         }
+    }
+
+    private void receiveEvents(JsonObject o) {
+        if(!getConfig().getBoolean("network-events.enabled",true)){networkEvents.clear();return;}
+        try {
+            if(o.get("version").getAsInt()!=1 || o.getAsJsonArray("events").size()>64)return;
+            List<NetworkEventCache.Event> incoming=new ArrayList<NetworkEventCache.Event>();
+            long now=System.currentTimeMillis();
+            for(JsonElement value:o.getAsJsonArray("events")){
+                JsonObject e=value.getAsJsonObject();
+                long deadline=e.get("deadline").getAsLong();
+                if(deadline>now+366L*86400000L)return;
+                incoming.add(new NetworkEventCache.Event(e.get("server").getAsString(),e.get("event").getAsString(),e.get("stage").getAsString(),deadline));
+            }
+            networkEvents.accept(o.get("origin").getAsString(),o.get("server").getAsString(),o.get("sentAt").getAsLong(),incoming,now);
+        }catch(RuntimeException ignored){getLogger().fine("Ignored invalid event snapshot");}
+    }
+
+    /** Stable reflection API used by all Pulse scoreboards. Text is legacy colored. */
+    public List<String> getNetworkEventLines(String format) {
+        List<String> lines=new ArrayList<String>();
+        if(!isEnabled() || !getConfig().getBoolean("network-events.enabled",true))return lines;
+        long now=System.currentTimeMillis();
+        String pattern=format==null||format.isEmpty()?getConfig().getString("network-events.format","&6{event} &7({server}) &f{time}"):format;
+        boolean localOnly=getConfig().getString("network-events.scope","ALL").equalsIgnoreCase("LOCAL");
+        boolean hcf=getServer().getPluginManager().isPluginEnabled("PulseHCF");
+        int limit=Math.max(0,Math.min(15,getConfig().getInt("network-events.max-lines",3)));
+        long ttl=Math.max(5,Math.min(60,getConfig().getLong("network-events.ttl-seconds",15)))*1000L;
+        for(NetworkEventCache.Event e:networkEvents.active(now,ttl,getConfig().getBoolean("network-events.show-waiting",true),localOnly)){
+            if(lines.size()>=limit)break;
+            if(hcf&&getConfig().getBoolean("network-events.hide-local-hcf-timers",true)&&e.server.equalsIgnoreCase(networkEvents.localServer())&&!e.type.equals("RESTART"))continue;
+            String label=getConfig().getString("network-events.labels."+e.type,e.type);
+            String time=e.stage.equals("WAITING")?getConfig().getString("network-events.waiting-text","Restarting"):e.remaining(now);
+            lines.add(org.bukkit.ChatColor.translateAlternateColorCodes('&',pattern.replace("{event}",label).replace("{server}",e.server).replace("{time}",time).replace("{state}",e.stage)));
+        }
+        return lines;
+    }
+
+    private void publishHcfTimers(){
+        if(timerApiWarned||!getConfig().getBoolean("hcf-timers.enabled",true)||Bukkit.getOnlinePlayers().isEmpty())return;
+        if(Bukkit.getPluginManager().isPluginEnabled("PulseHCFEvents"))return;
+        org.bukkit.plugin.Plugin hcf=Bukkit.getPluginManager().getPlugin("PulseHCF");
+        if(hcf==null||!hcf.isEnabled())return;
+        try {
+            Object engine=hcf.getClass().getMethod("getTimerEngine").invoke(hcf);
+            if(engine==null)return;
+            for(String id:new String[]{"eotw","sotw"}){
+                Object timer=engine.getClass().getMethod("getGlobal",String.class).invoke(engine,id);
+                if(timer!=null){long deadline=((Number)timer.getClass().getMethod("getExpiry").invoke(timer)).longValue();
+                    if(deadline>System.currentTimeMillis()){
+                        publishedTimers.put(id,deadline);lastTimer=id;
+                        publishTimer(id,deadline,id.equals("sotw")?"PROTECTION":"COUNTDOWN");return;
+                    }
+                }
+            }
+            if(lastTimer!=null){Long deadline=publishedTimers.remove(lastTimer);if(deadline!=null)publishTimer(lastTimer,deadline,System.currentTimeMillis()>=deadline?"LIVE":"CANCELLED");lastTimer=null;}
+        }catch(ReflectiveOperationException e){if(!timerApiWarned){getLogger().warning("PulseHCF timer API unavailable; native timer publication disabled until reload.");timerApiWarned=true;}}
+    }
+    private void publishTimer(String type,long deadline,String stage){
+        Player carrier=Bukkit.getOnlinePlayers().iterator().next();JsonObject packet=new JsonObject();packet.addProperty("type","NETWORK_EVENT");packet.addProperty("event",type.toUpperCase(java.util.Locale.ROOT));packet.addProperty("deadline",deadline);packet.addProperty("stage",stage);send(carrier,packet);
+    }
+    @Override public boolean onCommand(org.bukkit.command.CommandSender sender,org.bukkit.command.Command command,String label,String[] args){
+        if(!sender.hasPermission("pulsebridge.admin")){sender.sendMessage("§cNo permission.");return true;}
+        if(args.length==1&&args[0].equalsIgnoreCase("reload")){reloadConfig();networkEvents.clear();timerApiWarned=false;sender.sendMessage("§aPulseBridge reloaded.");return true;}
+        sender.sendMessage("§e/pulsebridge reload");return true;
     }
 
     private void open(Player player, JsonObject o) {
